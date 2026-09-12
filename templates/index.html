@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AnyVideo Downloader — যেকোনো ভিডিও ডাউনলোড করুন</title>
+<meta name="description" content="Paste any video link (YouTube, Facebook, Instagram, TikTok...) and download video in all qualities or audio as MP3." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <span class="logo-name">AnyVideo <em>Downloader</em></span>
+      <span class="logo-tag">যেকোনো লিংক · যেকোনো কোয়ালিটি</span>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <a href="#how">কিভাবে ব্যবহার করবেন</a>
+    <a href="#sites">সাপোর্টেড সাইট</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ SEARCH CARD ============ -->
+  <section class="hero">
+    <h1>ভিডিওর লিংক দিন,<br class="m-br"/> <span class="grad-text">যেকোনো কোয়ালিটিতে ডাউনলোড করুন</span></h1>
+    <p class="sub">YouTube · Facebook · Instagram · TikTok · Twitter/X · Vimeo আরও ১০০০+ সাইট — ভিডিও (MP4) ও অডিও (MP3)</p>
+
+    <div class="search-card" id="searchCard">
+      <div class="input-row">
+        <div class="input-box">
+          <svg class="link-ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <input id="urlInput" type="url" autocomplete="off" spellcheck="false"
+                 placeholder="https://www.youtube.com/watch?v=..." />
+          <button id="pasteBtn" class="ghost-btn" title="Paste">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+            <span>Paste</span>
+          </button>
+        </div>
+        <button id="fetchBtn" class="primary-btn">
+          <span class="btn-label">ডাউনলোড করুন</span>
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        </button>
+      </div>
+
+      <div id="loader" class="loader hidden">
+        <span class="spinner"></span>
+        <span>ভিডিওর তথ্য আনা হচ্ছে… <small>(ফেচ করতে কয়েক সেকেন্ড লাগতে পারে)</small></span>
+      </div>
+
+      <div id="errorBox" class="error-box hidden"></div>
+
+      <div class="quick-links">
+        দ্রুত টিপ: <span>YouTube</span> ভিডিও লিংক কপি করে এখানে পেস্ট করুন — সব কোয়ালিটি (360p থেকে 4K) ও MP3 পাবেন।
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section id="result" class="result-card hidden">
+    <div class="thumb-wrap">
+      <img id="thumb" alt="thumbnail" referrerpolicy="no-referrer" />
+      <span id="durationBadge" class="duration-badge"></span>
+    </div>
+    <div class="result-meta">
+      <div class="platform-line">
+        <span id="platformBadge" class="platform-badge"></span>
+        <span id="viewsBadge" class="views-badge"></span>
+      </div>
+      <h2 id="videoTitle"></h2>
+      <p id="uploader" class="uploader"></p>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="video">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          ভিডিও <small>Video</small>
+        </button>
+        <button class="tab" data-tab="audio">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          অডিও <small>Audio / MP3</small>
+        </button>
+      </div>
+
+      <div id="panel-video" class="quality-grid"></div>
+      <div id="panel-audio" class="quality-grid hidden"></div>
+
+      <p class="merge-note hidden" id="mergeNote">⚙ উচ্চ কোয়ালিটিতে (720p+) সার্ভার ভিডিও+অডিও মার্জ করে — তাই ডাউনলোড শুরু হতে ১০–৬০ সেকেন্ড লাগতে পারে। অপেক্ষা করুন, ব্রাউজার নিজেই ফাইল সেভ করবে।</p>
+    </div>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section id="historySection" class="history hidden">
+    <h3>সাম্প্রতিক <small>Recent</small></h3>
+    <div id="historyList" class="history-list"></div>
+  </section>
+
+  <!-- ============ HOW ============ -->
+  <section id="how" class="how">
+    <h2>কিভাবে ব্যবহার করবেন <small>How it works</small></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">১</div>
+        <h4>লিংক কপি করুন</h4>
+        <p>YouTube বা যেকোনো সাইট থেকে ভিডিওর লিংক কপি করুন।</p>
+      </div>
+      <div class="step">
+        <div class="step-num">২</div>
+        <h4>পেস্ট করুন</h4>
+        <p>উপরের বক্সে পেস্ট করে <b>ডাউনলোড করুন</b> চাপুন।</p>
+      </div>
+      <div class="step">
+        <div class="step-num">৩</div>
+        <h4>কোয়ালিটি বাছুন</h4>
+        <p>4K · 1080p · 720p · 480p · 360p বা MP3 — যেটা দরকার সেটাতে ক্লিক করুন।</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SITES ============ -->
+  <section id="sites" class="sites">
+    <h2>সাপোর্টেড প্ল্যাটফর্ম <small>Supported sites</small></h2>
+    <div class="site-chips">
+      <span class="chip hot">YouTube</span>
+      <span class="chip">Facebook</span>
+      <span class="chip">Instagram</span>
+      <span class="chip">TikTok</span>
+      <span class="chip">Twitter / X</span>
+      <span class="chip">Vimeo</span>
+      <span class="chip">Dailymotion</span>
+      <span class="chip">SoundCloud</span>
+      <span class="chip">Pinterest</span>
+      <span class="chip">Reddit</span>
+      <span class="chip">Twitch</span>
+      <span class="chip">LinkedIn</span>
+      <span class="chip">Bilibili</span>
+      <span class="chip">Rumble</span>
+      <span class="chip more">+ ১০০০ সাইট</span>
+    </div>
+    <p class="sites-note">* yt-dlp ইঞ্জিন ব্যবহার করা হয়েছে, যা ১০০০+ সাইট সাপোর্ট করে।</p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>⚠️ শুধুমাত্র নিজের ব্যবহারের জন্য ও অনুমতি আছে এমন কনটেন্ট ডাউনলোড করুন। কপিরাইট আইন ও প্ল্যাটফর্মের শর্তাবলী মেনে চলুন।</p>
+  <p class="en">For personal use only — respect copyright &amp; each platform's terms of service.</p>
+</footer>
+
+<div id="toast" class="toast hidden"></div>
+<iframe id="dlFrame" class="dl-frame" aria-hidden="true"></iframe>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
